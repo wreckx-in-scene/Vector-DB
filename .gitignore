@@ -1,0 +1,4 @@
+engine/engine
+engine/*.o
+gateway/gateway
+*.log
