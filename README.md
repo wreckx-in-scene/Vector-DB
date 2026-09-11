@@ -90,8 +90,10 @@ ollama serve
 # 2. C++ engine (internal, port 9090)
 cd engine && ./engine
 
-# 3. Go gateway (public, port 8080) — run from the repo root so it finds index.html,
-#    or set STATIC_DIR to point at it.
+# 3. Go gateway (public, port 8080) — safe to run from the repo root OR from
+#    gateway/. It auto-detects index.html in both locations and logs which
+#    directory it's serving the UI from. Set STATIC_DIR explicitly if you
+#    run the binary from somewhere else entirely.
 cd gateway && ./gateway
 ```
 
@@ -105,7 +107,7 @@ Then open `http://localhost:8080`.
 | `ENGINE_ADDR` | `http://127.0.0.1:9090` | gateway → engine target |
 | `OLLAMA_ADDR` | `http://127.0.0.1:11434` | gateway → Ollama target |
 | `PORT` | `8080` | gateway public port |
-| `STATIC_DIR` | `.` | where the gateway looks for `index.html` |
+| `STATIC_DIR` | auto-detected | where the gateway looks for `index.html`. Checks cwd, cwd's parent, the binary's directory, and that directory's parent — covers running from the repo root or from `gateway/`. Set explicitly to override (a missing `index.html` there is a fatal error, not a silent directory listing). |
 
 ## REST API reference
 
