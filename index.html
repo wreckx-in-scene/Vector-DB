@@ -1,95 +1,3 @@
-
-Claude finished the response
-No Ollama installed yet — here's the full setup, Windows-specific since that's what you're on:
-
-Hit your gateway's /status endpoint
-With engine.exe and gateway.exe both still running from before, open a new terminal and run: curl.exe http://localhost:8080/status — check the ollamaAvailable field. true means everything's wired up correctly and the Documents/Ask AI tabs will work. false means Ollama isn't reachable from the gateway even though it's installed — usually means the Ollama service silently stopped, check the tray icon again.
-1
-2
-3
-4
-5
-6
-One thing to flag before you pull the models: llama3.2 at ~2GB will run painfully slowly on a laptop CPU if you don't have a decent GPU — 10-30 seconds per answer is normal. If that's annoying, swap it for the 1B variant (ollama pull llama3.2:1b), which is faster but slightly less coherent — the original README mentions this exact tradeoff too.
-
-all done
-
-Awesome, glad it's all working end to end now — engine, gateway, UI, and Ollama all confirmed live.
-
-Given you've got that possible iRage Golang interview coming up around November, the notes I put together earlier (system design + HFT-flavored concurrency/latency questions) line up well with that prep — worth another pass through the STUDY_TOPICS.md concurrency and networking sections specifically, since those are exactly the kind of thing that interview track tends to probe.
-
-If anything else breaks or you want to keep building on this, just ping me.
-
-accha rn this frontend has padho with pratyush , i wanna customize it and also bg colors nd shit , readme bhi karna hai update so it looks like a student peoject not a edu
-
-Ran a command
-Found it — the <h1> literally says "padhowithPratyush". Let's look at the surrounding UI/CSS to figure out what to change.
-
-View the head/style section of index.html
-Let's nail down the two subjective bits before I touch code — everything else (README tone, removing the branding) I can just do.
-
-What should the header title say instead of 'padhowithPratyush'?
-"VectorDB — HNSW + RAG" (matches the browser tab title)
-What color vibe do you want?
-change acc to u , but keep it pretty like it is rn
-Ran a command
-Nice, I'll pick something — going with a rose/magenta accent (
-#ff3d78) against the existing dark cyan-and-purple palette. Keeps the same neon-dark vibe, just swaps the primary accent hue so it doesn't read as a generic purple AI-tool template anymore.
-
-Claude’s response was interrupted.
-also give the standalone files notthe whole zip
-
-Ran 2 commands, edited 2 files, and 2 more tools
-What changed:
-
-index.html — title now reads "VectorDB — HNSW + RAG" instead of "padhowithPratyush", and the accent color is swapped from indigo/purple (
-#6c63ff) to a rose/magenta (
-#ff3d78) everywhere it's used — badges, buttons, chat bubbles, context chips, and the scatter-plot edge lines. Kept the cyan/purple/amber/green category colors as-is since those weren't part of what you flagged.
-README.md — added an intro paragraph that's honest about what's yours vs. inherited: the algorithms come from the original repo, the process split + internal engine API + Go RAG orchestration are what you built. This matters more than it might seem — a README that reads like a from-scratch build when someone checks the commit history looks worse than one that's upfront about the starting point.
-Since these two files are the only ones that changed this turn, you really only need to drop them into your existing repo/ folder (index.html at the root, README.md at the root) — no rebuild needed since neither touches compiled code. I included the rest of the files above too since you asked for standalone rather than zipped, in case your folder structure got out of sync at any point.
-
-
-Index
-Code·HTML 
-
-Readme
-Document·MD 
-
-Main
-CPP 
-
-Httplib
-H 
-
-Main
-Code·GO 
-
-Engine
-Code·GO 
-
-Ollama
-Code·GO 
-
-Chunk
-Code·GO 
-
-Handlers
-Code·GO 
-
-Go
-MOD 
-
-.gitignore
-GITIGNORE 
-
-
-Write a message…
-
-
-Claude is AI and can make mistakes.
-
-
-Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,7 +27,7 @@ body {
   height: 100vh; overflow: hidden;
   display: flex; flex-direction: column;
 }
- 
+
 /* ── HEADER ── */
 header {
   background: var(--card); border-bottom: 1px solid var(--border);
@@ -135,21 +43,21 @@ header h1 {
 .badge.ok { border-color: var(--green); color: var(--green); background: rgba(166,227,161,.1); }
 .badge.err { border-color: var(--red); color: var(--red); background: rgba(243,139,168,.1); }
 #statsLabel { margin-left: auto; font-size: 11px; color: var(--muted); }
- 
+
 /* ── LAYOUT ── */
 .layout { display: flex; flex: 1; overflow: hidden; }
 .left-panel { width: 260px; flex-shrink: 0; background: var(--card); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 18px; }
 .center-panel { flex: 1; position: relative; overflow: hidden; }
 #scatter { display: block; width: 100%; height: 100%; }
 .right-panel { width: 360px; flex-shrink: 0; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
- 
+
 /* ── TABS ── */
 .tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
 .tab { flex: 1; padding: 10px 6px; text-align: center; font-size: 10px; letter-spacing: 1px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; }
 .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
 .tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px; flex-direction: column; gap: 16px; }
 .tab-content.on { display: flex; }
- 
+
 /* ── COMMON COMPONENTS ── */
 .sec { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 input[type=text], select, textarea {
@@ -173,15 +81,15 @@ button {
 .btn-g { background: rgba(166,227,161,.12); color: var(--green); border: 1px solid rgba(166,227,161,.3); }
 .btn-g:hover { background: rgba(166,227,161,.22); }
 .btn-g:disabled { opacity: .5; cursor: wait; }
- 
+
 .algo-row { display: flex; gap: 5px; }
 .algo-btn { flex: 1; padding: 7px 4px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-size: 10px; cursor: pointer; text-align: center; transition: all .2s; letter-spacing: .5px; font-family: inherit; }
 .algo-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(255,61,120,.12); }
- 
+
 .legend { display: flex; flex-direction: column; gap: 5px; }
 .leg-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
- 
+
 /* ── RESULTS ── */
 .results { display: flex; flex-direction: column; gap: 7px; }
 .rcard { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; animation: fadeUp .25s ease; }
@@ -194,7 +102,7 @@ button {
 .rdist { font-size: 10px; color: var(--muted); flex: 1; text-align: right; }
 .del   { background: rgba(243,139,168,.12); color: var(--red); border: 1px solid rgba(243,139,168,.25); border-radius: 4px; cursor: pointer; font-size: 10px; padding: 2px 7px; font-family: inherit; transition: background .2s; width: auto; }
 .del:hover { background: rgba(243,139,168,.25); }
- 
+
 /* ── LATENCY / BENCH / LAYERS ── */
 .lat-big { font-size: 32px; font-weight: 600; color: var(--cs); text-shadow: 0 0 20px rgba(0,217,255,.4); }
 .lat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -210,7 +118,7 @@ button {
 .lfill  { height: 100%; background: var(--accent); border-radius: 3px; opacity: .7; transition: width .4s; }
 .lcount { width: 80px; text-align: right; color: var(--muted); }
 #vecCvs { display: block; width: 100%; background: var(--bg); border-radius: 5px; }
- 
+
 /* ── DOCUMENT LIST ── */
 .doc-list { display: flex; flex-direction: column; gap: 7px; }
 .dcard { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; animation: fadeUp .25s ease; }
@@ -218,12 +126,12 @@ button {
 .dcard-preview { font-size: 10px; color: var(--muted); line-height: 1.5; margin-bottom: 6px; }
 .dcard-foot { display: flex; justify-content: space-between; align-items: center; }
 .dcard-words { font-size: 9px; color: var(--muted); }
- 
+
 /* ── OLLAMA STATUS ── */
 .ollama-status { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; font-size: 11px; line-height: 1.6; }
 .ollama-status.ok { border-color: rgba(166,227,161,.3); }
 .ollama-status.err { border-color: rgba(243,139,168,.3); }
- 
+
 /* ── CHAT ── */
 .chat-history { display: flex; flex-direction: column; gap: 12px; }
 .chat-q { background: rgba(255,61,120,.12); border: 1px solid rgba(255,61,120,.25); border-radius: 7px; padding: 10px 12px; font-size: 12px; line-height: 1.5; }
@@ -240,17 +148,17 @@ button {
 @keyframes spin { to { transform: rotate(360deg); } }
 .typing::after { content: '▋'; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
- 
+
 /* ── TOOLTIP ── */
 #tip { position: fixed; display: none; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 7px 11px; font-size: 11px; pointer-events: none; max-width: 220px; z-index: 200; line-height: 1.5; }
- 
+
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 </style>
 </head>
 <body>
- 
+
 <header>
   <h1>VectorDB — HNSW + RAG</h1>
   <span class="badge hl">HNSW</span>
@@ -259,9 +167,9 @@ button {
   <span class="badge" id="ollamaBadge">OLLAMA…</span>
   <span id="statsLabel">loading…</span>
 </header>
- 
+
 <div class="layout">
- 
+
   <!-- ══ LEFT PANEL ══ -->
   <div class="left-panel">
     <div>
@@ -320,10 +228,10 @@ button {
       <button class="btn-s" onclick="runBenchmark()">▶ COMPARE ALL ALGOS</button>
     </div>
   </div>
- 
+
   <!-- ══ CENTER: SCATTER PLOT ══ -->
   <div class="center-panel"><canvas id="scatter"></canvas></div>
- 
+
   <!-- ══ RIGHT PANEL: TABS ══ -->
   <div class="right-panel">
     <div class="tabs">
@@ -331,7 +239,7 @@ button {
       <div class="tab"     onclick="switchTab('docs')">DOCUMENTS</div>
       <div class="tab"     onclick="switchTab('rag')">ASK AI</div>
     </div>
- 
+
     <!-- TAB: SEARCH -->
     <div class="tab-content on" id="tab-search">
       <div>
@@ -360,7 +268,7 @@ button {
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: DOCUMENTS -->
     <div class="tab-content" id="tab-docs">
       <div>
@@ -383,7 +291,7 @@ button {
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: ASK AI (RAG) -->
     <div class="tab-content" id="tab-rag">
       <div>
@@ -408,12 +316,12 @@ button {
         </div>
       </div>
     </div>
- 
+
   </div><!-- end right-panel -->
 </div><!-- end layout -->
- 
+
 <div id="tip"></div>
- 
+
 <script>
 // ════════════════════════════════════════════════════════════
 //  CONSTANTS
@@ -423,13 +331,13 @@ const DIMS = 16;
 const COL  = { cs:'#00d9ff', math:'#b388ff', food:'#ffb74d', sports:'#69f0ae', doc:'#a6e3a1', default:'#90a4ae' };
 const DIM_COL = ['#00d9ff','#00d9ff','#00d9ff','#00d9ff','#b388ff','#b388ff','#b388ff','#b388ff',
                  '#ffb74d','#ffb74d','#ffb74d','#ffb74d','#69f0ae','#69f0ae','#69f0ae','#69f0ae'];
- 
+
 // ════════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════════
 let allItems = [], pcaPoints = [], hitIds = new Set(), queryPt = null;
 let hoverItem = null, pulse = 0, selAlgo = 'hnsw', searchResults = [];
- 
+
 // ════════════════════════════════════════════════════════════
 //  TABS
 // ════════════════════════════════════════════════════════════
@@ -442,7 +350,7 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('on');
   if (name === 'docs') loadDocList();
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  TEXT → 16-D EMBEDDING (for demo vectors)
 // ════════════════════════════════════════════════════════════
@@ -452,7 +360,7 @@ const KW = {
   food:   ['food','pizza','sushi','ramen','pasta','recipe','cook','eat','restaurant','dish','ingredient','flavor','spice','noodle','bread','croissant','taco','fish','rice','soup'],
   sports: ['sport','basketball','football','tennis','chess','swim','game','play','score','team','athlete','competition','match','tournament','olympic','dribble','tackle','serve']
 };
- 
+
 function textToEmbedding(text) {
   const t = text.toLowerCase(), ws = t.split(/\s+/);
   const s = {cs:0,math:0,food:0,sports:0};
@@ -472,7 +380,7 @@ function textToEmbedding(text) {
   fill(0,s.cs); fill(4,s.math); fill(8,s.food); fill(12,s.sports);
   return emb;
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  PCA
 // ════════════════════════════════════════════════════════════
@@ -502,21 +410,21 @@ function pca2D(embs) {
   const pc1=powerIter(X,null), pc2=powerIter(X,pc1);
   return X.map(x=>[x.reduce((s,v,i)=>s+v*pc1[i],0),x.reduce((s,v,i)=>s+v*pc2[i],0)]);
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  SCATTER PLOT
 // ════════════════════════════════════════════════════════════
 const sc=document.getElementById('scatter'), ctx=sc.getContext('2d');
 let bounds={minX:-1,maxX:1,minY:-1,maxY:1};
- 
+
 function resize() { const r=sc.parentElement.getBoundingClientRect(); sc.width=r.width; sc.height=r.height; }
 window.addEventListener('resize', resize);
- 
+
 function w2c(wx,wy) {
   const P=70,W=sc.width,H=sc.height,rx=bounds.maxX-bounds.minX||1,ry=bounds.maxY-bounds.minY||1;
   return [P+((wx-bounds.minX)/rx)*(W-2*P), H-P-((wy-bounds.minY)/ry)*(H-2*P)];
 }
- 
+
 function drawFrame() {
   ctx.clearRect(0,0,sc.width,sc.height);
   ctx.fillStyle='#07070f'; ctx.fillRect(0,0,sc.width,sc.height);
@@ -531,7 +439,7 @@ function drawFrame() {
   ctx.save();ctx.translate(18,sc.height/2+50);ctx.rotate(-Math.PI/2);ctx.fillText('PC₂ →',0,0);ctx.restore();
   ctx.fillStyle='#151530'; ctx.font='12px Fira Code,monospace';
   ctx.fillText('2D PCA Projection  ·  Semantic Space',80,28);
- 
+
   if (queryPt && hitIds.size>0) {
     const [qx,qy]=w2c(queryPt.x,queryPt.y);
     for (const pt of pcaPoints) {
@@ -576,7 +484,7 @@ function drawFrame() {
   pulse+=0.05;
   requestAnimationFrame(drawFrame);
 }
- 
+
 sc.addEventListener('mousemove', e => {
   const rect=sc.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
   hoverItem=null; let best=18;
@@ -592,7 +500,7 @@ sc.addEventListener('mousemove', e => {
   } else tip.style.display='none';
 });
 sc.addEventListener('mouseleave',()=>{hoverItem=null;document.getElementById('tip').style.display='none';});
- 
+
 // ════════════════════════════════════════════════════════════
 //  LOAD DEMO ITEMS
 // ════════════════════════════════════════════════════════════
@@ -611,7 +519,7 @@ async function loadItems() {
     document.getElementById('statsLabel').textContent=allItems.length+' vectors · '+DIMS+' dims';
   } catch(_) {}
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  DEMO SEARCH
 // ════════════════════════════════════════════════════════════
@@ -619,7 +527,7 @@ function setAlgo(el) {
   document.querySelectorAll('.algo-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on'); selAlgo=el.dataset.algo;
 }
- 
+
 async function runSearch() {
   const text=document.getElementById('qInput').value.trim(); if(!text)return;
   const emb=textToEmbedding(text),k=parseInt(document.getElementById('kSlider').value);
@@ -642,9 +550,9 @@ async function runSearch() {
     renderResults(searchResults); drawVecChart(emb);
   } catch(_){alert('Cannot reach server — is it running on :8080?');}
 }
- 
+
 document.getElementById('qInput').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch();});
- 
+
 function renderResults(results) {
   if (!results||!results.length){document.getElementById('results').innerHTML='<div style="color:var(--muted);font-size:11px">No results</div>';return;}
   document.getElementById('results').innerHTML=results.map((r,i)=>{
@@ -660,7 +568,7 @@ function renderResults(results) {
     </div>`;
   }).join('');
 }
- 
+
 function drawVecChart(emb) {
   const vc=document.getElementById('vecCvs'),W=vc.parentElement.clientWidth;
   vc.width=W;const vx=vc.getContext('2d');
@@ -676,7 +584,7 @@ function drawVecChart(emb) {
   });
   vx.textAlign='left';
 }
- 
+
 async function runBenchmark() {
   const text=document.getElementById('qInput').value.trim()||'binary tree algorithm';
   const emb=textToEmbedding(text),metric=document.getElementById('metric').value;
@@ -695,7 +603,7 @@ async function runBenchmark() {
     }).join('');
   } catch(_) {}
 }
- 
+
 async function loadHNSW() {
   try {
     const r=await fetch(API+'/hnsw-info'), d=await r.json();
@@ -706,7 +614,7 @@ async function loadHNSW() {
     }).join('')||'<div style="color:var(--muted);font-size:11px">Empty</div>';
   } catch(_) {}
 }
- 
+
 async function addVector() {
   const meta=document.getElementById('addMeta').value.trim(),cat=document.getElementById('addCat').value;
   if(!meta)return;
@@ -717,7 +625,7 @@ async function addVector() {
     await loadItems();loadHNSW();
   } catch(_) {}
 }
- 
+
 async function deleteItem(id) {
   try {
     await fetch(`${API}/delete/${id}`,{method:'DELETE'});
@@ -725,7 +633,7 @@ async function deleteItem(id) {
     renderResults(searchResults);await loadItems();loadHNSW();
   } catch(_) {}
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  DOCUMENT MANAGEMENT
 // ════════════════════════════════════════════════════════════
@@ -753,17 +661,17 @@ async function checkOllamaStatus() {
     }
   } catch(_) {}
 }
- 
+
 async function insertDocument() {
   const title=document.getElementById('docTitle').value.trim();
   const text=document.getElementById('docText').value.trim();
   const btn=document.getElementById('insertDocBtn');
   const status=document.getElementById('insertStatus');
   if(!title||!text){status.textContent='⚠ Need both a title and text.';return;}
- 
+
   btn.disabled=true; btn.textContent='Embedding…';
   status.innerHTML='<span style="color:var(--muted)">Calling Ollama nomic-embed-text…</span>';
- 
+
   try {
     const r=await fetch(API+'/doc/insert',{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -776,14 +684,14 @@ async function insertDocument() {
       status.innerHTML=`<span style="color:var(--green)">✓ Inserted ${d.chunks} chunk(s) · ${d.dims}D embeddings</span>`;
       document.getElementById('docTitle').value='';
       document.getElementById('docText').value='';
- 
+
           // Insert a 16D fake vector into the visualizer DB so it shows up on the map
           const emb16 = textToEmbedding(title + ' ' + text);
           fetch(API+'/insert', {
             method:'POST', headers:{'Content-Type':'application/json'},
             body:JSON.stringify({metadata: title, category: 'doc', embedding: emb16})
           }).then(() => { loadItems().then(loadHNSW); });
- 
+
       loadDocList(); checkOllamaStatus();
     }
   } catch(_) {
@@ -791,7 +699,7 @@ async function insertDocument() {
   }
   btn.disabled=false; btn.textContent='⚡ EMBED & INSERT';
 }
- 
+
 async function loadDocList() {
   try {
     const r=await fetch(API+'/doc/list'), docs=await r.json();
@@ -811,42 +719,42 @@ async function loadDocList() {
       </div>`).join('');
   } catch(_) {}
 }
- 
+
 async function deleteDoc(id) {
   try {
     await fetch(`${API}/doc/delete/${id}`,{method:'DELETE'});
     loadDocList(); checkOllamaStatus();
   } catch(_) {}
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  RAG  — Ask AI
 // ════════════════════════════════════════════════════════════
 document.getElementById('ragQuestion').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.ctrlKey)askAI();
 });
- 
+
 async function askAI() {
   const question=document.getElementById('ragQuestion').value.trim();
   if(!question)return;
   const k=parseInt(document.getElementById('ragK').value);
   const btn=document.getElementById('askBtn');
   btn.disabled=true; btn.textContent='Thinking…';
- 
+
   const history=document.getElementById('chatHistory');
   // Clear previous conversation
   history.innerHTML='';
- 
+
   // Show question bubble
   const qDiv=document.createElement('div'); qDiv.className='chat-q';
   qDiv.textContent=question; history.appendChild(qDiv);
- 
+
   // Show thinking indicator
   const thinkDiv=document.createElement('div'); thinkDiv.className='thinking';
   thinkDiv.innerHTML='<div class="spinner"></div>Retrieving context & generating answer…';
   history.appendChild(thinkDiv);
   history.scrollTop=history.scrollHeight;
- 
+
   // Update the scatter plot visualizer in the background using the real 768D DB
   fetch(API+'/doc/search', {
     method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -884,7 +792,7 @@ async function askAI() {
         }).catch(()=>{});
     }
   }).catch(()=>{});
- 
+
   try {
     const r=await fetch(API+'/doc/ask',{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -892,9 +800,9 @@ async function askAI() {
     });
     const d=await r.json();
     thinkDiv.remove();
- 
+
     const aDiv=document.createElement('div'); aDiv.className='chat-a';
- 
+
     if (d.error) {
       aDiv.innerHTML=`<div class="chat-a-label">ERROR</div><div class="chat-a-text" style="color:var(--red)">${d.error}</div>`;
     } else {
@@ -907,7 +815,7 @@ async function askAI() {
             `<div class="ctx-expand" id="ctx-${i}">${c.text}</div>`).join('')+
         `</div>`;
       history.appendChild(aDiv);
- 
+
       // Typewriter effect
       const target=aDiv.querySelector('#typeTarget');
       target.classList.add('typing');
@@ -918,27 +826,27 @@ async function askAI() {
         history.scrollTop=history.scrollHeight;
       },18);
     }
- 
+
     if (!d.error) { /* already appended above */ }
     else history.appendChild(aDiv);
- 
+
   } catch(e) {
     thinkDiv.remove();
     const err=document.createElement('div');err.className='chat-a';
     err.innerHTML='<div class="chat-a-label">ERROR</div><div class="chat-a-text" style="color:var(--red)">Server error — is the backend running?</div>';
     history.appendChild(err);
   }
- 
+
   document.getElementById('ragQuestion').value='';
   btn.disabled=false; btn.textContent='🤖 ASK AI';
   history.scrollTop=history.scrollHeight;
 }
- 
+
 function toggleCtx(i) {
   const el=document.getElementById('ctx-'+i);
   el.style.display=el.style.display==='block'?'none':'block';
 }
- 
+
 // ════════════════════════════════════════════════════════════
 //  BOOT
 // ════════════════════════════════════════════════════════════
@@ -948,4 +856,3 @@ checkOllamaStatus();
 </script>
 </body>
 </html>
- 
